@@ -1,7 +1,9 @@
 package com.lozijy.Prefix;
 
+import java.util.Arrays;
+
 public class leetcode209 {
-    //我的第一眼是滑动窗口呜呜呜还是做出来了
+    //我的第一眼是滑动窗口好不熟，各种情况给我绕晕了,呜呜呜还是做出来了
     public static int minSubArrayLen(int target, int[] nums) {
         int ret=Integer.MAX_VALUE;
         int l=0;
@@ -55,6 +57,55 @@ public class leetcode209 {
         }
         ret = Math.min(ret, r - l + 1);
         return ret;
+    }
+    
+    //优雅的滑动窗口
+    public int minSubArrayLen3(int s, int[] nums) {
+            int n = nums.length;
+            if (n == 0) {
+                return 0;
+            }
+            int ans = Integer.MAX_VALUE;
+            int start = 0, end = 0;
+            int sum = 0;
+            while (end < n) {
+                sum += nums[end];
+                while (sum >= s) {
+                    ans = Math.min(ans, end - start + 1);
+                    sum -= nums[start];
+                    start++;
+                }
+                end++;
+            }
+            return ans == Integer.MAX_VALUE ? 0 : ans;
+    }
+
+    //前缀和解法
+    public int minSubArrayLen2(int s, int[] nums) {
+        int n = nums.length;
+        if (n == 0) {
+            return 0;
+        }
+        int ans = Integer.MAX_VALUE;
+        int[] sums = new int[n + 1];
+        // 为了方便计算，令 size = n + 1
+        // sums[0] = 0 意味着前 0 个元素的前缀和为 0
+        // sums[1] = A[0] 前 1 个元素的前缀和为 A[0]
+        // 以此类推
+        for (int i = 1; i <= n; i++) {
+            sums[i] = sums[i - 1] + nums[i - 1];
+        }
+        for (int i = 1; i <= n; i++) {
+            int target = s + sums[i - 1];
+            int bound = Arrays.binarySearch(sums, target);
+            if (bound < 0) {
+                bound = -bound - 1;
+            }
+            if (bound <= n) {
+                ans = Math.min(ans, bound - (i - 1));
+            }
+        }
+        return ans == Integer.MAX_VALUE ? 0 : ans;
     }
 
     public static void main(String[] args) {
